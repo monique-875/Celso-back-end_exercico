@@ -1,0 +1,199 @@
+//Exercício 1 - Usuários
+function ValidarUsuario(id) {
+  if (!id || isNaN(id)) {
+    return "id valido";
+  }
+}
+
+function procurarUsuario(usuario) {
+  if (usuario.length === 0) {
+    return "produto não encontrado";
+  }
+}
+
+function verificarPositivo(valor) {
+  if (valor !== "number" || valor <= 0) {
+    return "Valor deve ser um número positivo";
+  }
+}
+
+
+
+app.get("/usuarios", async (req, res) => {
+  try {
+    const usuarios = await queryAsync("SELECT * FROM usuario");
+    res.status(200).json({
+      sucesso: true,
+      dados: usuarios,
+      total: usuarios.length,
+    });
+  } catch (erro) {
+    //executado apenas se um erro ocorrerno  no try
+    console.log("Erro ao listar usuarios:", erro);
+    res.status(500).json({
+      sucesso: false,
+      mensagem: " Erro ao listar usuarios",
+      erro: erro.message,
+    });
+  }
+  {
+  }
+});
+
+app.get("/usuarios/:id", async (req, res) => {
+  try {
+    const erro = validarIdProduto(id);
+    if (erro) {
+      // isNan é not a number
+      return res.status(400).json({
+        sucesso: false,
+      });
+    }
+    const usuario = procurarUsuario(usuario);
+
+    if (usuario) {
+      return res.status(404).json({
+        sucesso: false,
+      });
+    }
+    res.json({
+      sucesso: true,
+      dados: usuario[0],
+    });
+  } catch (erro) {
+    console.log("Erro ao encontrar usuario:", erro);
+    res.status(500).json({
+      sucesso: false,
+      erro: erro.message,
+    });
+  }
+});
+
+
+
+//Exercício 2 - Pedidos
+
+function ValidarSeExisteSala(sala) {
+  if (sala.length === 0) {
+    return "Sala não encontrada.";
+  }
+}
+
+app.post("/pedidos", async (req, res) => {
+  try {
+    const { cliente, valor } = req.body;
+
+    if (!cliente || !valor) {
+      return res.status(400).json({
+        sucesso: false,
+        mensagem: "O cliente e valor são obrigatórios",
+      });
+    }
+
+    if (verificarPositivo) {
+      return res.status(400).json({
+        sucesso: false,
+      });
+    }
+  } catch (erro) {
+    console.error("Erro ao salvar pedido:", erro);
+    res.status(500).json({
+      sucesso: false,
+      mensagem: "Erro ao salvar pedido.",
+      erro: erro.message,
+    });
+  }
+});
+
+
+//Exercício 3 - Salas
+
+app.put("/salas/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { dados } = req.body;
+
+    if (!id || isNaN(id)) {
+      return res.status(400).json({
+        sucesso: false,
+        mensagem: "ID da sala  inválido.",
+      });
+    }
+
+    const salaExistente = await queryAsync("SELECT * FROM sala WHERE id = ?", [
+      id,
+    ]);
+
+    const length = ValidarSeExisteSala(sala);
+    if (length) {
+      return res.status(404).json({
+        sucesso: false,
+        mensagem: length,
+      });
+    }
+
+    const salaAtualizada = {};
+
+    if (dados !== undefined) salaAtualizada.dados = dados.trim();
+
+    if (Object.keys(salaAtualizada).length === 0) {
+      // analiza todos os objetos presentes no java
+      return res.status(400).json({
+        sucesso: false,
+        mensagem: "Nenhum campo para atualizar",
+      });
+    }
+
+    await queryAsync("UPDATE sala SET ? WHERE id = ?", [salaAtualizada, id]);
+    res.json({
+      sucesso: true,
+      mensagem: "sala atualizado.",
+    });
+  } catch (erro) {
+    console.error("Erro ao atualizar sala:", erro);
+    res.status(500).json({
+      sucesso: false,
+      mensagem: "Erro ao atualizar sala.",
+      erro: erro.message,
+    });
+  }
+});
+
+app.delete("/salas/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const erro = validarUsuario(id);
+
+    if (erro) {
+      return res.status(400).json({
+        sucesso: false,
+        mensagem: "ID sala inválido.",
+      });
+    }
+
+    const salaExistente = await queryAsync("SELECT * FROM sala WHERE id = ?", [
+      id,
+    ]);
+
+    if (length) {
+      return res.status(404).json({
+        sucesso: false,
+        mensagem: length,
+      });
+    }
+
+    await queryAsync("DELETE FROM sala WHERE id = ?", [id]);
+
+    res.status(200).json({
+      sucesso: true,
+      mensagem: "sala apagado",
+    });
+  } catch (erro) {
+    console.error("Erro ao apagar sala:", erro);
+    res.status(500).json({
+      sucesso: false,
+      mensagem: "Erro ao apagar sala.",
+      erro: erro.message,
+    });
+  }
+});

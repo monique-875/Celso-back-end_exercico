@@ -136,7 +136,7 @@ app.put('/salas/:id', async (req, res) => {
 
 app.delete('/salas/:id', async (req, res) => {
     try {
-        const id = req.params
+        const {id} = req.params
 
         const sala = await queryAsync("SELECT * FROM sala WHERE id = ?", [id])
 

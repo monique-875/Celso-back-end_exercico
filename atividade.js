@@ -197,3 +197,100 @@ app.delete("/salas/:id", async (req, res) => {
     });
   }
 });
+
+
+// correção 
+
+//Exercício 1
+function mensagem(res, tipo) {
+    res.status(404).json({
+        sucesso: false,
+        mensagem: `${tipo} não encontrado(a).`
+    })
+}
+
+function validarExistencia(resultado, res, tipo) {
+    if (resultado.length === 0) {
+        mensagem(res, tipo)
+        return false
+    }
+    return true
+}
+
+app.get('/usuario', async (req, res) => {
+    try {
+        const listaUsuarios = await queryAsync("SELECT * FROM usuario")
+        res.status(200).json({
+            sucesso: true,
+            dados: listaUsuarios
+        })
+
+    } catch (erro) {
+        res.status(500).json({
+            sucesso: false,
+            mensagem: erro
+        })
+
+    }
+})
+
+app.get('/usuario/:id', async (req, res) => {
+    try {
+        const { id } = req.params
+        const usuario = await queryAsync("SELECT * FROM usuario WHERE id = ?", [id])
+
+        if (!validarExistencia(usuario, res, "Usuário")) {
+            return
+        }
+
+        res.status(200).json({
+            sucesso: true,
+            dados: usuario[0]
+        })
+    } catch (erro) {
+        res.status(500).json({
+            sucesso: false,
+            mensagem: erro
+        })
+    }
+})
+
+//Exercício 2
+
+const validarDadosPedido = ({ cliente, valor }) => {
+    if (!cliente || valor === undefined) {
+        return "Cliente e valor são obrigatórios."
+    }
+
+    if (typeof valor !== 'number' || valor <= 0) {
+        return "Valor inválido"
+    }
+
+    return null
+}
+
+app.post('/pedidos', async (req, res) => {
+    try {
+        const erro = validarDadosPedido(req.body)
+
+        if (erro) {
+            return res.status(400).json({
+                sucesso: false,
+                mensagem: erro
+            })
+        }
+
+        await queryAsync("INSERT INTO pedido SET ?", [req.body])
+
+        res.status(201).json({
+            sucesso: true,
+            mensagem: "Pedido cadastrado."
+        })
+
+    } catch (erro) {
+        res.status(500).json({
+            sucesso: false,
+            mensagem: erro
+        })
+    }
+})

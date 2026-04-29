@@ -294,3 +294,69 @@ app.post('/pedidos', async (req, res) => {
         })
     }
 })
+
+//Exercício 3
+
+const validarDadosAtualizados = (dados, res) => {
+    if (Object.keys(dados).length === 0) {
+            res.status(400).json({
+            sucesso: false,
+            mensagem: "Nenhum dado enviado"
+        })
+        return false
+    }
+    return true
+}
+
+app.put('/salas/:id', async (req, res) => {
+    try {
+        const { id } = req.params
+        const dados = req.body
+
+        const sala = await queryAsync("SELECT * FROM sala WHERE id = ?", [id])
+
+        if (!validarExistencia(sala, res, "Sala")) {
+            return
+        }
+
+        if(!validarDadosAtualizados(dados, res)){
+            return
+        }
+
+        await queryAsync("UPDATE sala SET ? WHERE id = ?", [dados, id])
+
+        res.status(200).json({
+            sucesso: true,
+            mensagem: "Sala atualizada"
+        })
+    } catch (erro) {
+        res.status(500).json({
+            sucesso: false,
+            mensagem: erro
+        })
+    }
+})
+
+app.delete('/salas/:id', async (req, res) => {
+    try {
+        const {id} = req.params
+
+        const sala = await queryAsync("SELECT * FROM sala WHERE id = ?", [id])
+
+        if (!validarExistencia(sala, res, "Sala")) {
+            return
+        }
+
+        await queryAsync("DELETE FROM sala WHERE id = ?", [id])
+
+        res.status(200).json({
+            sucesso: true,
+            mensagem: "Sala removida."
+        })
+    } catch (erro) {
+        res.status(500).json({
+            sucesso: false,
+            mensagem: erro
+        })
+    }
+})
